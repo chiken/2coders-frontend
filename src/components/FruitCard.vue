@@ -12,7 +12,7 @@
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
 
-        <v-btn icon>
+        <v-btn icon @click="deleteEvent(fruit._id, idx)">
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </v-card-actions>
@@ -21,14 +21,27 @@
 </template>
 
 <script>
+import APIServices from "../services/Api";
+
 export default {
   data() {
     return {
       show: false
     };
   },
+  methods: {
+    deleteEvent(fruitId, idx) {
+      APIServices.deleteFruit(fruitId)
+        .then(() => {
+          this.deleteFruit(idx);
+        })
+        .catch(err => console.log(err));
+    }
+  },
   props: {
-    fruit: Object
+    fruit: Object,
+    idx: Number,
+    deleteFruit: Function
   }
 };
 </script>

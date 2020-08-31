@@ -14,7 +14,7 @@
 
     <v-row>
       <v-col xs="12" md="6" lg="4" v-for="(fruit, idx) in fruits" :key="idx">
-        <FruitCard :fruit="fruit" />
+        <FruitCard :fruit="fruit" :idx="idx" :deleteFruit="deleteFruit" />
       </v-col>
     </v-row>
   </div>
@@ -32,6 +32,11 @@ export default {
   },
   components: {
     FruitCard
+  },
+  methods: {
+    deleteFruit(idx) {
+      this.fruits.splice(idx, 1);
+    }
   },
   mounted() {
     APIServices.getProducts().then(response => {
