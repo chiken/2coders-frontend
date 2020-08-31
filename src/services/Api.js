@@ -20,5 +20,13 @@ export default {
   async deleteFruit(fruitId) {
     const response = await API.delete(`/${fruitId}`);
     return response.data;
+  },
+  async getFruitByID(fruitId) {
+    const response = await API.get(`/${fruitId}`);
+    return response.data;
+  },
+  async updateFruit(fruitUpdated, fruitId) {
+    const response = await API.put(`/${fruitId}`, fruitUpdated);
+    return response.data;
   }
 };

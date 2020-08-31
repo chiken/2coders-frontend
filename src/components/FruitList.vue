@@ -12,17 +12,19 @@
       </v-col>
 
       <v-col xs="12" md="6" lg="4">
-        <v-btn class="ma-2" tile color="indigo" dark to="/new">
+        <v-btn class="ma-2" tile color="#BEE9D3" to="/new">
           Añadir nueva fruta
         </v-btn>
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="fruits.length !== 0">
       <v-col xs="12" md="6" lg="4" v-for="(fruit, idx) in fruits" :key="idx">
         <FruitCard :fruit="fruit" :idx="idx" :deleteFruit="deleteFruit" />
       </v-col>
     </v-row>
+
+    <span v-else class="span"> No se encuentra ninguna fruta </span>
   </div>
 </template>
 
@@ -58,4 +60,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.span {
+  display: block;
+  margin: auto !important;
+  text-align: center;
+  padding: 100px;
+  color: #717d7e;
+}
+</style>

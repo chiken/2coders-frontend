@@ -1,14 +1,19 @@
 <template>
   <v-container>
-    <v-card>
-      <v-img :src="fruit.img" class="white--text align-end" height="300px">
+    <v-card @click="showFruit(fruit._id)">
+      <v-img
+        :src="fruit.img"
+        contain
+        class="white--text align-end"
+        height="300px"
+      >
       </v-img>
 
       <v-card-actions>
         <v-card-title v-text="fruit.name"></v-card-title>
         <v-spacer></v-spacer>
 
-        <v-btn icon>
+        <v-btn icon @click="updateFruit(fruit._id)">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
 
@@ -60,6 +65,12 @@ export default {
           this.dialog = false;
         })
         .catch(err => console.log(err));
+    },
+    showFruit(id) {
+      this.$router.push(`/view/${id}`);
+    },
+    updateFruit(id) {
+      this.$router.push(`/update/${id}`);
     }
   },
   props: {

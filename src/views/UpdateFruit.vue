@@ -9,23 +9,25 @@
               @change="onFileSelected"
             ></v-file-input>
             <v-img
-              :src="previewImage"
+              :src="src"
               class="white--text align-end"
               height="500px"
+              contain
             />
           </v-col>
           <v-col sm="12" md="6">
             <v-text-field v-model="name" label="Nombre" />
             <v-text-field v-model="color" class="mt-5" label="Color" />
             <v-select v-model="size" :items="items" label="Tamaño" />
-            <v-row>
+
+            <v-row class="mt-16">
               <v-col xs="4" sm="6">
                 <v-btn
+                  :disabled="loading"
                   class="btn"
                   color="#BEE9D3"
                   width="200px"
                   @click="goBack"
-                  :disabled="loading"
                 >
                   Volver
                 </v-btn>
@@ -37,23 +39,15 @@
                   color="#E4E9BE"
                   width="200px"
                   :loading="loading"
-                  :disabled="loading"
+                  :disabled="checkInputs || loading"
                   @click="loader = 'loading'"
                 >
-                  Añadir fruta
+                  Actualizar
 
                   <template v-slot:loader>
-                    <span>Agregando fruta...</span>
+                    <span>Actualizando fruta...</span>
                   </template>
                 </v-btn>
-              </v-col>
-            </v-row>
-
-            <v-row>
-              <v-col cols="12">
-                <span id="span" v-if="error">
-                  Todos los campos son requeridos*
-                </span>
               </v-col>
             </v-row>
           </v-col>
@@ -64,48 +58,47 @@
 </template>
 
 <script>
-import firebase from "firebase";
 import APIServices from "../services/Api";
+import firebase from "firebase";
 
 export default {
   data() {
     return {
-      disabled: false,
-      loader: null,
       name: "",
       color: "",
       size: "",
-      error: false,
-      loading: false,
+      src: "",
+      items: ["Pequeño", "Mediano", "Grande"],
       selectedFile: "",
-      previewImage:
-        "https://www.lyon-ortho-clinic.com/files/cto_layout/img/placeholder/camera.jpg",
-      items: ["Pequeño", "Mediano", "Grande"]
+      loading: false,
+      loader: null,
+      backUpName: "",
+      backUpColor: "",
+      backUpSize: "",
+      backUpSrc: ""
     };
   },
   watch: {
     async loader() {
-      if (this.checkInputs()) {
-        const l = this.loader;
-        this[l] = !this[l];
+      const l = this.loader;
+      this[l] = !this[l];
+
+      const fruitUpdated = {};
+
+      if (this.selectedFile.length !== 0) {
         const imgURL = await this.uploadImage();
-
-        const newFruit = {
-          name: this.name,
-          color: this.color,
-          size: this.size,
-          img: imgURL
-        };
-
-        APIServices.addFruit(newFruit).then(() => {
-          this[l] = false;
-          this.loader = null;
-          this.$router.push("/");
-        });
-      } else {
-        this.loader = null;
-        this.error = true;
+        fruitUpdated.img = imgURL;
       }
+
+      fruitUpdated.name = this.name;
+      fruitUpdated.color = this.color;
+      fruitUpdated.size = this.size;
+
+      APIServices.updateFruit(fruitUpdated, this.$route.params.id).then(() => {
+        this[l] = false;
+        this.loader = null;
+        this.$router.push("/");
+      });
     }
   },
   methods: {
@@ -114,13 +107,12 @@ export default {
       if (file) {
         let reader = new FileReader();
         reader.onload = e => {
-          this.previewImage = e.target.result;
+          this.src = e.target.result;
           this.selectedFile = file;
         };
         reader.readAsDataURL(file);
       } else {
-        this.previewImage =
-          "https://www.lyon-ortho-clinic.com/files/cto_layout/img/placeholder/camera.jpg";
+        this.src = this.backUpSrc;
         this.selectedFile = "";
       }
     },
@@ -147,15 +139,31 @@ export default {
     },
     goBack() {
       this.$router.push("/");
-    },
+    }
+  },
+  computed: {
     checkInputs() {
       return (
-        this.selectedFile.length !== 0 &&
-        this.name.length !== 0 &&
-        this.color.length !== 0 &&
-        this.size.length !== 0
+        this.backUpName === this.name &&
+        this.backUpColor === this.color &&
+        this.backUpSize === this.size &&
+        this.selectedFile.length === 0
       );
     }
+  },
+  mounted() {
+    APIServices.getFruitByID(this.$route.params.id)
+      .then(response => {
+        this.name = response[0].name;
+        this.backUpName = response[0].name;
+        this.color = response[0].color;
+        this.backUpColor = response[0].color;
+        this.size = response[0].size;
+        this.backUpSize = response[0].size;
+        this.src = response[0].img;
+        this.backUpSrc = response[0].img;
+      })
+      .catch(err => console.log(err));
   }
 };
 </script>
@@ -165,12 +173,5 @@ export default {
   display: block;
   margin: auto;
   margin-top: 40px;
-}
-
-#span {
-  display: block;
-  margin-top: 40px !important;
-  text-align: center;
-  color: red;
 }
 </style>
