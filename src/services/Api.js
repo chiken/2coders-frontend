@@ -9,8 +9,8 @@ const API = axios.create({
 });
 
 export default {
-  async getProducts() {
-    const response = await API.get("/");
+  async getProducts(filter) {
+    const response = await API.get(`/?name=${filter}`);
     return response.data;
   },
   async addFruit(newFruit) {

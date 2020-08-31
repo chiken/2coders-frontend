@@ -2,7 +2,13 @@
   <div>
     <v-row>
       <v-col xs="12" md="6">
-        <v-text-field class="mx-5" label="Buscador" append-icon="mdi-magnify" />
+        <v-text-field
+          v-model="search"
+          @keyup="updateSearch"
+          class="mx-5"
+          label="Buscador"
+          append-icon="mdi-magnify"
+        />
       </v-col>
 
       <v-col xs="12" md="6" lg="4">
@@ -27,7 +33,8 @@ import FruitCard from "@/components/FruitCard.vue";
 export default {
   data() {
     return {
-      fruits: []
+      fruits: [],
+      search: ""
     };
   },
   components: {
@@ -36,10 +43,15 @@ export default {
   methods: {
     deleteFruit(idx) {
       this.fruits.splice(idx, 1);
+    },
+    updateSearch() {
+      APIServices.getProducts(this.search).then(response => {
+        this.fruits = response;
+      });
     }
   },
   mounted() {
-    APIServices.getProducts().then(response => {
+    APIServices.getProducts("").then(response => {
       this.fruits = response;
     });
   }
