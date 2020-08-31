@@ -12,11 +12,33 @@
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
 
-        <v-btn icon @click="deleteEvent(fruit._id, idx)">
+        <v-btn icon @click.stop="dialog = true">
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </v-card-actions>
     </v-card>
+
+    <v-row justify="center">
+      <v-dialog v-model="dialog" width="280">
+        <v-card>
+          <v-card-title class="headline"
+            >¿Seguro que quieres eliminar esta fruta?</v-card-title
+          >
+
+          <v-card-actions>
+            <v-btn color="green darken-1" text @click="dialog = false">
+              Volver
+            </v-btn>
+
+            <v-spacer></v-spacer>
+
+            <v-btn color="red" text @click="deleteEvent(fruit._id, idx)">
+              Eliminar
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-container>
 </template>
 
@@ -26,7 +48,8 @@ import APIServices from "../services/Api";
 export default {
   data() {
     return {
-      show: false
+      show: false,
+      dialog: false
     };
   },
   methods: {
@@ -34,6 +57,7 @@ export default {
       APIServices.deleteFruit(fruitId)
         .then(() => {
           this.deleteFruit(idx);
+          this.dialog = false;
         })
         .catch(err => console.log(err));
     }
