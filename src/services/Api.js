@@ -9,7 +9,7 @@ const API = axios.create({
 });
 
 export default {
-  async getProducts(filter) {
+  async getFruits(filter) {
     const response = await API.get(`/?name=${filter}`);
     return response.data;
   },

@@ -47,13 +47,13 @@ export default {
       this.fruits.splice(idx, 1);
     },
     updateSearch() {
-      APIServices.getProducts(this.search).then(response => {
+      APIServices.getFruits(this.search).then(response => {
         this.fruits = response;
       });
     }
   },
   mounted() {
-    APIServices.getProducts("").then(response => {
+    APIServices.getFruits("").then(response => {
       this.fruits = response;
     });
   }
