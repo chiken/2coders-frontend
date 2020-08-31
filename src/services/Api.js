@@ -12,5 +12,9 @@ export default {
   async getProducts() {
     const response = await API.get("/fruits/");
     return response.data;
+  },
+  async addFruit(newFruit) {
+    const response = await API.post("/fruits/", newFruit);
+    return response.data;
   }
 };
